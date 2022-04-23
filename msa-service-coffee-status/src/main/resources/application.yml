@@ -1,0 +1,43 @@
+server:
+  port: 8082
+
+logging:
+  level:
+    com.hoony: debug
+
+mybatis:
+  config-location: classpath:mybatis/mybatis-config.xml
+
+spring:
+  application:
+    name: msa-service-coffee-status
+  # config server
+  config:
+    import: "optional:configserver:http://localhost:8888"
+
+# eureka client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9091/eureka/
+
+# actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+# circuit breaker
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        failure-rate-threshold: 50
+        event-consumer-buffer-size: 10

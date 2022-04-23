@@ -1,0 +1,49 @@
+server:
+  port: 9090
+
+
+spring:
+  application:
+    name: msa-architecture-gateway
+  # config server
+  config:
+    import: "optional:configserver:http://localhost:8888"
+  cloud:
+    gateway:
+      routes:
+        - id: msa-service-coffee-order
+          uri: http://localhost:8080
+          predicates:
+            - Path=/coffee-order/**
+          filters:
+            - RewritePath=/coffee-order/(?<path>.*),/$\{path}
+        - id: mas-service-coffee-member
+          uri: http://localhost:8081
+          predicates:
+            - Path=/coffee-member/**
+          filters:
+            - RewritePath=/coffee-member/(?<path>.*),/$\{path}
+        - id: mas-service-coffee-status
+          uri: http://localhost:8082
+          predicates:
+            - Path=/coffee-status/**
+          filters:
+            - RewritePath=/coffee-status/(?<path>.*),/$\{path}
+# eureka client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9091/eureka
+    healthcheck:
+      enabled: true
+
+# actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "gateway"
+  endpoint:
+    gateway:
+      enabled: true
